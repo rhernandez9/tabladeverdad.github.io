@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Tabla de Verdad</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        input {
+            padding: 10px;
+            font-size: 16px;
+            width: 300px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 80%;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Generador de Tabla de Verdad</h1>
+    <p>Ingresa una expresión lógica utilizando letras y operadores (+, *, ') y presiona "Generar Tabla de Verdad".</p>
+    
+    <input type="text" id="expression" placeholder="Ejemplo: (A + B') * (C + A')">
+    <button onclick="generateTable()">Generar Tabla de Verdad</button>
+
+    <div id="table-container"></div>
+
+    <script>
+        function generateTruthTable(expression) {
+            function validateAndTransform(expr) {
+                const validChars = /^[a-zA-Z()+*'\s]+$/;
+                if (!validChars.test(expr)) {
+                    throw new Error("La expresión contiene caracteres no válidos.");
+                }
+
+                let stack = [];
+                for (let char of expr) {
+                    if (char === '(') stack.push(char);
+                    if (char === ')') {
+                        if (stack.length === 0) {
+                            throw new Error("Los paréntesis no están balanceados.");
+                        }
+                        stack.pop();
+                    }
+                }
+                if (stack.length !== 0) throw new Error("Los paréntesis no están balanceados.");
+
+                expr = expr.replace(/\s+/g, '')       // Quitar espacios
+                           .replace(/\+/g, '||')      // Reemplazar + con ||
+                           .replace(/\*/g, '&&')      // Reemplazar * con &&
+                           .replace(/([a-zA-Z])'/g, '!$1') // Reemplazar letra' con !letra
+                           .replace(/([a-zA-Z])(?=[a-zA-Z])/g, '$1&&'); // Reemplazar letras juntas con &&
+
+                return expr;
+            }
+
+            function getVariables(expr) {
+                const vars = new Set(expr.match(/[a-zA-Z]/g));
+                return Array.from(vars).sort();
+            }
+
+            function calculateTruthTable(expr, variables) {
+                const rows = [];
+                const totalRows = 1 << variables.length;
+
+                for (let i = 0; i < totalRows; i++) {
+                    let values = {};
+                    variables.forEach((variable, index) => {
+                        values[variable] = Boolean(i & (1 << (variables.length - index - 1)));
+                    });
+
+                    let evaluatedExpr = expr;
+                    for (const [variable, value] of Object.entries(values)) {
+                        evaluatedExpr = evaluatedExpr.replace(new RegExp(`\\b${variable}\\b`, 'g'), value);
+                    }
+
+                    let result = eval(evaluatedExpr) ? 1 : 0;
+                    rows.push({ ...Object.fromEntries(Object.entries(values).map(([k, v]) => [k, v ? 1 : 0])), Resultado: result });
+                }
+
+                return rows;
+            }
+
+            try {
+                const transformedExpr = validateAndTransform(expression);
+                const variables = getVariables(transformedExpr);
+                return calculateTruthTable(transformedExpr, variables);
+            } catch (error) {
+                alert(error.message);
+                return null;
+            }
+        }
+
+        function generateTable() {
+            const expression = document.getElementById('expression').value;
+            const truthTable = generateTruthTable(expression);
+
+            const tableContainer = document.getElementById('table-container');
+            tableContainer.innerHTML = '';
+
+            if (truthTable) {
+                const table = document.createElement('table');
+                const headerRow = document.createElement('tr');
+
+                const headers = Object.keys(truthTable[0]);
+                headers.forEach(header => {
+                    const th = document.createElement('th');
+                    th.textContent = header;
+                    headerRow.appendChild(th);
+                });
+                table.appendChild(headerRow);
+
+                truthTable.forEach(row => {
+                    const tableRow = document.createElement('tr');
+                    Object.values(row).forEach(value => {
+                        const cell = document.createElement('td');
+                        cell.textContent = value;
+                        tableRow.appendChild(cell);
+                    });
+                    table.appendChild(tableRow);
+                });
+
+                tableContainer.appendChild(table);
+            }
+        }
+    </script>
+</body>
+</html>
