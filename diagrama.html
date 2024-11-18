@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabla de Verdad</title>
+        <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="js/tex-mml-chtml.js"></script>
+    <script type="text/javascript" src="js/simcir.js"></script>
+    <link rel="stylesheet" type="text/css" href="js/simcir.css" />
+    <script type="text/javascript" src="js/simcir-basicset.js"></script>
+    <link rel="stylesheet" type="text/css" href="js/simcir-basicset.css" />
+    <script type="text/javascript" src="js/simcir-library.js"></script>    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        input {
+            padding: 10px;
+            font-size: 16px;
+            width: 300px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 80%;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        #output {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Generador de Tabla de Verdad</h1>
+    <p>Selecciona una salida e Ingresa una expresión lógica utilizando letras y operadores (+, *, ') y presiona "Generar Tabla de Verdad".</p>
+    <input type="text" id="outexp" placeholder="Salida: Z,X,Y">
+    <input type="text" id="expression" placeholder="Ecuación: (A + B') * (C + A')">
+    <button onclick="generateTable()">Generar Tabla de Verdad</button>
+    <div id="output"></div>
+    <div id="table-container"></div>
+
+<div class="accordion" id="accordionExample">
+  <div class="card">
+    <div class="card-header" id="headingOne">
+      <h2 class="mb-0">
+        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+          Ecuacion Min & Max Termino
+        </button>
+      </h2>
+    </div>
+
+    <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
+      <div class="card-body">
+        <table border="0" class="table">
+            <tr class="table-row-group">
+                <th>SOP</th>
+                <th>&nbsp;</th>
+                <th>POS</th>
+            </tr>
+            <tr>
+                <td><div id="sop" ></div></td>
+                <td>&nbsp;</td>
+                <td><div id="pos" ></div></td>
+            </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header" id="headingTwo">
+      <h2 class="mb-0">
+        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+          Ecuacion Max Termino
+        </button>
+      </h2>
+    </div>
+    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+      <div class="card-body">
+        xxx
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header" id="headingThree">
+      <h2 class="mb-0">
+        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+          Diagrama
+        </button>
+      </h2>
+    </div>
+    <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
+      <div class="card-body">
+    <div class="simcir">
+{
+  "width": 800,
+  "height": 400,
+  "showToolbox": false,
+  "devices": [
+    {
+      "type": "In",
+      "id": "dev2",
+      "x": 56,
+      "y": 88,
+      "label": "A"
+    },
+    {
+      "type": "In",
+      "id": "dev3",
+      "x": 136,
+      "y": 168,
+      "label": "B"
+    },
+    {
+      "type": "In",
+      "id": "dev4",
+      "x": 216,
+      "y": 248,
+      "label": "C"
+    },
+    {
+      "type": "OR",
+      "id": "dev1",
+      "x": 232,
+      "y": 72,
+      "label": "OR"
+    },
+    {
+      "type": "OR",
+      "id": "dev5",
+      "x": 332,
+      "y": 72,
+      "label": "OR"
+    },
+    {
+      "type": "Out",
+      "id": "dev0",
+      "x": 544,
+      "y": 80,
+      "label": "Out"
+    }
+  ],
+  "connectors": [
+    {
+      "from": "dev2.out0",
+      "to": "dev1.in0"
+    },
+    {
+      "from": "dev2.out0",
+      "to": "dev3.in0"
+    },
+    {
+      "from": "dev2.out0",
+      "to": "dev4.in0"
+    }
+  ]
+}
+    </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <script>
+        function generateTruthTable(expression) {
+            function validateAndTransform(expr) {
+                const validChars = /^[a-zA-Z()+*'\s]+$/;
+                if (!validChars.test(expr)) {
+                    throw new Error("La expresión contiene caracteres no válidos.");
+                }
+
+                let stack = [];
+                for (let char of expr) {
+                    if (char === '(') stack.push(char);
+                    if (char === ')') {
+                        if (stack.length === 0) {
+                            throw new Error("Los paréntesis no están balanceados.");
+                        }
+                        stack.pop();
+                    }
+                }
+                if (stack.length !== 0) throw new Error("Los paréntesis no están balanceados.");
+
+                    expr = expr.replace(/\s+/g, '')       // Quitar espacios
+                               .replace(/\+/g, '||')      // Reemplazar + con ||
+                               .replace(/\*/g, '&&')      // Reemplazar * con &&
+                               .replace(/([a-zA-Z])'(?=[a-zA-Z])/g, '!$1&&') // Reemplazar letra' seguido de otra letra con !letra&&
+                               .replace(/([a-zA-Z])'/g, '!$1') // Reemplazar letra' con !letra
+                               .replace(/([a-zA-Z])(?=[a-zA-Z])/g, '$1&&') // Reemplazar letras juntas con &&
+                               .replace(/\)(?=[a-zA-Z])/g, ')&&'); // Reemplazar ) seguido de letra con )&&
+
+                return expr;
+            }
+
+            function getVariables(expr) {
+                const vars = new Set(expr.match(/[a-zA-Z]/g));
+                return Array.from(vars).sort();
+            }
+
+            function calculateTruthTable(expr, variables) {
+                const outexp = document.getElementById('outexp').value; // Obtén el valor de la variable `outexp`
+                const rows = [];
+                const totalRows = 1 << variables.length;
+
+                for (let i = 0; i < totalRows; i++) {
+                    let values = {};
+                    variables.forEach((variable, index) => {
+                        values[variable] = Boolean(i & (1 << (variables.length - index - 1)));
+                    });
+
+                    let evaluatedExpr = expr;
+                    for (const [variable, value] of Object.entries(values)) {
+                        evaluatedExpr = evaluatedExpr.replace(new RegExp(`\\b${variable}\\b`, 'g'), value);
+                    }
+
+                    let result = eval(evaluatedExpr) ? 1 : 0;
+
+                    // Usa claves dinámicas para incluir el valor de `outexp` como nombre de la propiedad
+                    rows.push({ 
+                        ...Object.fromEntries(Object.entries(values).map(([k, v]) => [k, v ? 1 : 0])), 
+                        [outexp.toUpperCase()]: result // Clave dinámica con el valor de `outexp`
+                    });
+                }
+
+                return rows;
+            }
+
+
+            try {
+                const transformedExpr = validateAndTransform(expression);
+                const variables = getVariables(transformedExpr);
+                return { transformedExpr, variables, table: calculateTruthTable(transformedExpr, variables) };
+            } catch (error) {
+                alert(error.message);
+                return null;
+            }
+        }
+
+        function renderExpression(expr) {
+            return expr.replace(/\|\|/g, '+')
+                       .replace(/&&/g, '\\cdot ')
+                       .replace(/!/g, '\\neg ')
+                       .replace(/\(/g, '\\left(')
+                       .replace(/\)/g, '\\right)');
+        }
+        // Llama a esta función después de generar la tabla de verdad
+        function generateTable() {
+            const expression = document.getElementById('expression').value;
+            const result = generateTruthTable(expression.toUpperCase(),outexp);
+
+            if (!result) return;
+
+            const { transformedExpr, variables, table } = result;
+
+            // Renderizar la tabla de verdad y ecuación transformada
+            const outputDiv = document.getElementById('output');
+            outputDiv.innerHTML = `<p>Expresión transformada: \\(${renderExpression(transformedExpr)}\\)</p>`;
+            MathJax.typeset();
+
+            // Mostrar tabla
+            const tableContainer = document.getElementById('table-container');
+            tableContainer.innerHTML = '';
+
+            const htmlTable = document.createElement('table');
+            const headerRow = document.createElement('tr');
+            const headers = Object.keys(table[0]);
+            headers.forEach(header => {
+                const th = document.createElement('th');
+                th.textContent = header;
+                headerRow.appendChild(th);
+            });
+            htmlTable.appendChild(headerRow);
+
+            table.forEach(row => {
+                const tableRow = document.createElement('tr');
+                Object.values(row).forEach(value => {
+                    const cell = document.createElement('td');
+                    cell.textContent = value;
+                    tableRow.appendChild(cell);
+                });
+                htmlTable.appendChild(tableRow);
+            });
+
+            tableContainer.appendChild(htmlTable);
+
+            // Obtener SOP y POS
+            get_sop_pos(table, variables);
+        }
+
+        function get_sop_pos(table, variables) {
+             const outexp = document.getElementById('outexp').value;
+            let sop = [];
+            let pos = [];
+            console.log(table);
+            // Recorre la tabla para obtener los minitérminos (SOP) y maxitérminos (POS)
+            table.forEach(row => {
+                let termSOP = [];
+                let termPOS = [];
+                let isSOP = false;
+                let isPOS = false;
+
+                // Identificar minitérminos y maxitérminos según los valores de la salida
+                for (const [key, value] of Object.entries(row)) {
+                    if (key === outexp.toUpperCase()) { // Aquí asumo que 'Z' es la salida (ajusta si es necesario)
+                        if (value === 1) {
+                            isSOP = true;
+                        } else if (value === 0) {
+                            isPOS = true;
+                        }
+                    }
+                }
+
+                if (isSOP) {
+                    // Construir minitérmino (SOP)
+                    variables.forEach(variable => {
+                        const value = row[variable];
+                        termSOP.push(value === 1 ? variable : `${variable}'`);
+                    });
+                    sop.push(`(${termSOP.join(' * ')})`);
+                }
+
+                if (isPOS) {
+                    // Construir maxitérmino (POS)
+                    variables.forEach(variable => {
+                        const value = row[variable];
+                        termPOS.push(value === 0 ? `${variable}'` : `${variable}`);
+                    });
+                    pos.push(`(${termPOS.join(' + ')})`);
+                }
+            });
+
+            // Mostrar SOP y POS en sus respectivos contenedores
+            document.getElementById('sop').innerHTML = sop.join(' + ');
+            document.getElementById('pos').innerHTML = pos.join(' * ');
+        }        
+    </script>
+</body>
+<!-- Fin Body -->
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script type="text/javascript" >
+
+if (window.sessionStorage) {}
+else
+{
+    document.getElementById("label_warning").innerHTML="Tu Browser no soporta sessionStorage";
+    throw new Error('Tu Browser no soporta sessionStorage!');
+}
+
+</script>
+</html>
